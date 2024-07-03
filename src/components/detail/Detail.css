@@ -69,6 +69,10 @@
   color: lightgray;
 }
 
+.photoItem:first-child {
+  margin-top: 20px;
+}
+
 .photoItem {
   display: flex;
   justify-content: space-between;
