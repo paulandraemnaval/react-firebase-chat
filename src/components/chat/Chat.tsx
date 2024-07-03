@@ -52,7 +52,10 @@ const Chat = () => {
         </div>
         <div className="message own">
           <div className="texts">
-            <img src="/img.png" alt="sent_image" />
+            <img
+              src="https://images.toucharger.com/img/graphiques/fonds-d-ecran/nature--paysages/coucher-de-soleil/polynesie.72440.jpg"
+              alt="sent_image"
+            />
             <p>
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Nisi
               facilis, sequi ex modi soluta libero iste facere recusandae iusto
