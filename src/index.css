@@ -18,7 +18,7 @@ body {
   display: flex;
   width: 90vw;
   height: 90vh;
-  background-color: rgba(26, 185, 203, 0.6);
+  background-color: rgba(29, 31, 31, 0.5);
   backdrop-filter: blur(10px) saturate(140%);
   border-radius: 10px;
 }
