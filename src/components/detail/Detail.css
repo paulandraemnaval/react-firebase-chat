@@ -1,5 +1,6 @@
 .Detail {
   flex: 1;
+  overflow-y: scroll;
 }
 .Detail .user {
   display: flex;
@@ -48,6 +49,7 @@
   display: flex;
   gap: 20px;
   flex-direction: column;
+  margin-top: 20px;
 }
 
 .photoDetail {
@@ -69,10 +71,6 @@
   color: lightgray;
 }
 
-.photoItem:first-child {
-  margin-top: 20px;
-}
-
 .photoItem {
   display: flex;
   justify-content: space-between;
@@ -87,4 +85,29 @@
   width: 30px;
   background-color: rgba(127, 139, 141, 0.7);
   object-fit: cover;
+}
+
+.info button {
+  padding: 20px 10px;
+  background-color: #da4557;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.info button:hover {
+  background-color: #c43e4f;
+}
+
+.info button[class="logoutButton"] {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #5183fe;
+  color: white;
+}
+
+.info button[class="logoutButton"]:hover {
+  background-color: #4a7bf6;
 }

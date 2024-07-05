@@ -1,11 +1,12 @@
 import React from "react";
 import "./Detail.css";
+import { auth } from "../../lib/firebase";
 const Detail = () => {
   return (
     <div className="Detail">
       <div className="user">
         <img src="/avatar.png" alt="avatar" />
-        <h2>Bea Ramirez</h2>
+        <h2>john doe</h2>
         <p>user description goes here</p>
       </div>
       <div className="info">
@@ -91,6 +92,14 @@ const Detail = () => {
           </div>
         </div>
         <button>Block User</button>
+        <button
+          className="logoutButton"
+          onClick={() => {
+            auth.signOut();
+          }}
+        >
+          Log out
+        </button>
       </div>
     </div>
   );

@@ -12,6 +12,7 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
+  width: 100vw;
 }
 
 .container {
@@ -21,4 +22,17 @@ body {
   background-color: rgba(29, 31, 31, 0.5);
   backdrop-filter: blur(10px) saturate(140%);
   border-radius: 10px;
+}
+
+.loading {
+  width: fit-content;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  height: 80px;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 36px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
 }

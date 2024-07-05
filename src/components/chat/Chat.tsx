@@ -1,21 +1,63 @@
 import React from "react";
 import "./Chat.css";
 import EmojiPicker from "emoji-picker-react";
+import { db } from "../../lib/firebase";
+import {
+  arrayUnion,
+  collection,
+  doc,
+  onSnapshot,
+  updateDoc,
+} from "firebase/firestore";
+import { useChatStore } from "../../lib/chatStore";
+import { useUserStore } from "../../lib/userStore";
 const Chat = () => {
   const [showEmoji, setShowEmoji] = React.useState(false);
   const [message, setMessage] = React.useState("");
+  const [chat, setChat] = React.useState();
+  const endRef = React.useRef(null);
+  const { chatID, changeChat, user } = useChatStore();
+  const { currentUser } = useUserStore();
 
+  React.useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
+
+  React.useEffect(() => {
+    const unSub = onSnapshot(doc(db, "chats", chatID), (snap) => {
+      setChat(snap.data());
+      console.log("Chat.tsx: ->", snap.data());
+    });
+    return () => unSub();
+  }, [chatID]);
   const handleEmojiClick = (event) => {
     setMessage(message + event.emoji);
   };
-  console.log(message);
+
+  const handleSend = async () => {
+    if (message === "") return;
+    try {
+      const chatCollectionRef = collection(db, "chats");
+      const messageRef = doc(chatCollectionRef, chatID);
+      await updateDoc(messageRef, {
+        messages: arrayUnion({
+          message: message,
+          sender: currentUser.id,
+          time: Date.now(),
+        }),
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <div className="chat">
       <div className="top">
         <div className="user">
-          <img src="/avatar.png" alt="userImage" />
+          <img src={user.avatar} alt="userImage" />
           <div className="texts">
-            <span>Bea Ramirez</span>
+            <span>{user.username}</span>
             <p>User description goes here</p>
           </div>
         </div>
@@ -26,80 +68,20 @@ const Chat = () => {
         </div>
       </div>
       <div className="center">
-        <div className="message">
-          <img src="/avatar.png" alt="sender_avatar" />
-          <div className="texts">
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Nisi
-              facilis, sequi ex modi soluta libero iste facere recusandae iusto
-              enim necessitatibus natus saepe repellendus quibusdam eius fugit
-              similique. Tempore, similique?
-            </p>
-            <span>1 min ago</span>
+        {chat?.messages.map((message) => (
+          <div
+            className={
+              message.sender === currentUser.id ? "message own" : "message"
+            }
+            key={message.lastMessageTime}
+          >
+            <div className="texts">
+              <p>{message.message}</p>
+              {/* <span>1 min ago</span> */}
+            </div>
           </div>
-        </div>
-        <div className="message">
-          <img src="/avatar.png" alt="sender_avatar" />
-          <div className="texts">
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Nisi
-              facilis, sequi ex modi soluta libero iste facere recusandae iusto
-              enim necessitatibus natus saepe repellendus quibusdam eius fugit
-              similique. Tempore, similique?
-            </p>
-            <span>1 min ago</span>
-          </div>
-        </div>
-        <div className="message own">
-          <div className="texts">
-            <img
-              src="https://images.toucharger.com/img/graphiques/fonds-d-ecran/nature--paysages/coucher-de-soleil/polynesie.72440.jpg"
-              alt="sent_image"
-            />
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Nisi
-              facilis, sequi ex modi soluta libero iste facere recusandae iusto
-              enim necessitatibus natus saepe repellendus quibusdam eius fugit
-              similique. Tempore, similique?
-            </p>
-            <span>1 min ago</span>
-          </div>
-        </div>
-        <div className="message">
-          <img src="/avatar.png" alt="sender_avatar" />
-          <div className="texts">
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Nisi
-              facilis, sequi ex modi soluta libero iste facere recusandae iusto
-              enim necessitatibus natus saepe repellendus quibusdam eius fugit
-              similique. Tempore, similique?
-            </p>
-            <span>1 min ago</span>
-          </div>
-        </div>
-        <div className="message own">
-          <div className="texts">
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Nisi
-              facilis, sequi ex modi soluta libero iste facere recusandae iusto
-              enim necessitatibus natus saepe repellendus quibusdam eius fugit
-              similique. Tempore, similique?
-            </p>
-            <span>1 min ago</span>
-          </div>
-        </div>
-        <div className="message">
-          <img src="/avatar.png" alt="sender_avatar" />
-          <div className="texts">
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Nisi
-              facilis, sequi ex modi soluta libero iste facere recusandae iusto
-              enim necessitatibus natus saepe repellendus quibusdam eius fugit
-              similique. Tempore, similique?
-            </p>
-            <span>1 min ago</span>
-          </div>
-        </div>
+        ))}
+        <div ref={endRef}></div>
       </div>
 
       <div className="bottom">
@@ -112,7 +94,9 @@ const Chat = () => {
           type="text"
           placeholder="Type a message"
           className="messageInput"
-          onChange={(event) => setMessage(event.target.value)}
+          onChange={(event) => {
+            setMessage(event.target.value);
+          }}
           value={message}
         />
         <div className="emoji">
@@ -125,7 +109,9 @@ const Chat = () => {
             <EmojiPicker open={showEmoji} onEmojiClick={handleEmojiClick} />
           </div>
         </div>
-        <button className="send">Send</button>
+        <button className="send" onClick={handleSend}>
+          Send
+        </button>
       </div>
     </div>
   );
