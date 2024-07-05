@@ -10,6 +10,7 @@
 }
 
 .searchBar {
+  color: white;
   flex: 1;
   background-color: rgba(127, 139, 141, 0.7);
   display: flex;
@@ -43,6 +44,7 @@
 
 .item {
   display: flex;
+  color: white;
   align-items: center;
   gap: 20px;
   padding: 20px;
@@ -68,4 +70,5 @@
 .item .texts p {
   font-weight: 300;
   font-size: 14px;
+  margin-top: 5px;
 }

@@ -9,7 +9,6 @@ export const useChatStore = create((set) => ({
   isRecieverBlocked: false,
   changeChat: (chatID, user) => {
     const currentUser = useUserStore.getState().currentUser;
-
     if (user.blocked.includes(currentUser.uid)) {
       return set({
         chatID,

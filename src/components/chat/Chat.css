@@ -35,12 +35,13 @@
 .chat .top .texts span {
   font-size: 18px;
   font-weight: bold;
+  color: white;
 }
 
 .chat .top .texts p {
   font-size: 14px;
   font-weight: 300;
-  color: gray;
+  color: white;
 }
 
 .top .icons {

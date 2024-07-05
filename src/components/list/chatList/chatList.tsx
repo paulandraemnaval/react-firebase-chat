@@ -2,7 +2,7 @@ import React from "react";
 import "./chatList.css";
 import AddUser from "./addUser/addUser";
 import { useUserStore } from "../../../lib/userStore";
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 import { useChatStore } from "../../../lib/chatStore";
 const chatList = () => {
@@ -40,6 +40,19 @@ const chatList = () => {
   const handleSelectChat = async (chat) => {
     changeChat(chat.chatID, chat.user);
   };
+
+  const handleSeen = async (chat) => {
+    try {
+      const chatRef = await getDoc(doc(db, "userchats", currentUser.id));
+      const chatData = chatRef.data().chats;
+      const chatIndex = chatData.findIndex((c) => c.chatID === chat.chatID);
+      chatData[chatIndex].isSeen = true;
+
+      await updateDoc(doc(db, "userchats", currentUser.id), {
+        chats: chatData,
+      });
+    } catch (err) {}
+  };
   return (
     <div className="chatList">
       <div className="search">
@@ -54,20 +67,36 @@ const chatList = () => {
           onClick={() => setIsAdding(!isAdding)}
         />
       </div>
-
-      {chats.map((chat) => (
-        <div
-          className="item"
-          key={chat.chatID}
-          onClick={() => handleSelectChat(chat)}
-        >
-          <img src={chat.user.avatar} alt="avatar" />
-          <div className="texts">
-            <span>{chat.user.username}</span>
-            <p>{chat.lastChat}</p>
-          </div>
-        </div>
-      ))}
+      {chats.map(
+        (chat) => (
+          console.log("chatList.tsx ->", chat),
+          (
+            <div
+              className="item"
+              key={chat.chatID}
+              onClick={() => {
+                handleSelectChat(chat);
+                handleSeen(chat);
+              }}
+              style={{
+                backgroundColor: chat.isSeen ? "transparent" : "#5183fe",
+              }}
+            >
+              <img src={chat.user.avatar} alt="avatar" />
+              <div className="texts">
+                <span>{chat.user.username}</span>
+                <p
+                  style={{
+                    color: chat.isSeen ? "rgba(127, 139, 141, 0.911)" : "white",
+                  }}
+                >
+                  {chat.lastChat}
+                </p>
+              </div>
+            </div>
+          )
+        )
+      )}
       {isAdding && <AddUser />}
     </div>
   );

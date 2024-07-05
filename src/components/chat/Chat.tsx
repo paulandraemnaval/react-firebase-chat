@@ -6,6 +6,7 @@ import {
   arrayUnion,
   collection,
   doc,
+  getDoc,
   onSnapshot,
   updateDoc,
 } from "firebase/firestore";
@@ -26,7 +27,6 @@ const Chat = () => {
   React.useEffect(() => {
     const unSub = onSnapshot(doc(db, "chats", chatID), (snap) => {
       setChat(snap.data());
-      console.log("Chat.tsx: ->", snap.data());
     });
     return () => unSub();
   }, [chatID]);
@@ -45,6 +45,29 @@ const Chat = () => {
           sender: currentUser.id,
           time: Date.now(),
         }),
+      });
+
+      const userIDs = [user.id, currentUser.id];
+
+      userIDs.forEach(async (id) => {
+        const userChatRef = doc(db, "userchats", id);
+        const userChatSnap = await getDoc(userChatRef);
+
+        if (userChatSnap.exists()) {
+          const userChatData = userChatSnap.data();
+          const userIndex = userChatData.chats.findIndex(
+            (chat) => chat.chatID === chatID
+          );
+
+          userChatData.chats[userIndex].lastChat = message;
+          userChatData.chats[userIndex].lastMessageTime = Date.now();
+          userChatData.chats[userIndex].isSeen =
+            id === currentUser.id ? true : false;
+
+          await updateDoc(userChatRef, {
+            chats: userChatData.chats,
+          });
+        }
       });
     } catch (err) {
       console.log(err);
