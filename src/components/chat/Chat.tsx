@@ -6,6 +6,7 @@ import {
   arrayUnion,
   collection,
   doc,
+  DocumentData,
   getDoc,
   onSnapshot,
   updateDoc,
@@ -15,15 +16,16 @@ import { useUserStore } from "../../lib/userStore";
 const Chat = () => {
   const [showEmoji, setShowEmoji] = React.useState(false);
   const [message, setMessage] = React.useState("");
-  const [chat, setChat] = React.useState();
-  const endRef = React.useRef(null);
+  const [chat, setChat] = React.useState<DocumentData>();
+  const endRef = React.useRef<HTMLDivElement>(null);
   const { chatID, changeChat, user } = useChatStore();
   const { currentUser } = useUserStore();
 
   React.useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, []);
-
+    if (endRef.current) {
+      endRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [chatID]);
   React.useEffect(() => {
     const unSub = onSnapshot(doc(db, "chats", chatID), (snap) => {
       setChat(snap.data());

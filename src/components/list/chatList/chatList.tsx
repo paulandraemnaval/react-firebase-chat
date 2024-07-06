@@ -5,6 +5,20 @@ import { useUserStore } from "../../../lib/userStore";
 import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 import { useChatStore } from "../../../lib/chatStore";
+import { DocumentData } from "firebase/firestore/lite";
+
+interface chat {
+  chatID: string;
+  isSeen: boolean;
+  user: {
+    avatar: string;
+    username: string;
+  };
+  lastChat: string;
+  lastMessageTime: number;
+  receiverID: string;
+}
+
 const chatList = () => {
   const [isAdding, setIsAdding] = React.useState(false);
   const [chats, setChats] = React.useState([]);
@@ -17,7 +31,7 @@ const chatList = () => {
     const onSub = onSnapshot(
       doc(db, "userchats", currentUser.id),
       async (response) => {
-        const data = response.data().chats;
+        const data: DocumentData = response.data()?.chats;
 
         const promises = data.map(async (chat) => {
           const userDocumnentRef = doc(db, "users", chat.recieverID);
@@ -27,7 +41,7 @@ const chatList = () => {
 
           return { ...chat, user };
         });
-        const chatData = await Promise.all(promises);
+        const chatData: any = await Promise.all(promises);
         setChats(
           chatData.sort((a, b) => b.lastMessageTime - a.lastMessageTime)
         );
@@ -41,10 +55,10 @@ const chatList = () => {
     changeChat(chat.chatID, chat.user);
   };
 
-  const handleSeen = async (chat) => {
+  const handleSeen = async (chat: chat) => {
     try {
       const chatRef = await getDoc(doc(db, "userchats", currentUser.id));
-      const chatData = chatRef.data().chats;
+      const chatData = chatRef.data()?.chats;
       const chatIndex = chatData.findIndex((c) => c.chatID === chat.chatID);
       chatData[chatIndex].isSeen = true;
 
@@ -68,7 +82,7 @@ const chatList = () => {
         />
       </div>
       {chats.map(
-        (chat) => (
+        (chat: chat) => (
           console.log("chatList.tsx ->", chat),
           (
             <div
@@ -87,7 +101,9 @@ const chatList = () => {
                 <span>{chat.user.username}</span>
                 <p
                   style={{
-                    color: chat.isSeen ? "rgba(127, 139, 141, 0.911)" : "white",
+                    color: chat.isSeen
+                      ? "rgba(127, 139, 141, 0.911)"
+                      : "1white",
                   }}
                 >
                   {chat.lastChat}
