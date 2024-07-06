@@ -12,6 +12,17 @@
   margin: auto;
   color: white;
 
+  .image {
+    display: grid;
+    grid-template-rows: 1fr;
+    img {
+      width: 30px;
+      height: 30px;
+      object-fit: cover;
+      margin-left: auto;
+      cursor: pointer;
+    }
+  }
   form {
     display: flex;
     gap: 20px;

@@ -22,16 +22,16 @@ const Chat = () => {
   const { currentUser } = useUserStore();
 
   React.useEffect(() => {
-    if (endRef.current) {
-      endRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [chatID]);
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chat?.messages]); //chat.messages is the dependency here because we want to scroll to the end of the chat after all messages are loaded
+
   React.useEffect(() => {
     const unSub = onSnapshot(doc(db, "chats", chatID), (snap) => {
       setChat(snap.data());
     });
     return () => unSub();
-  }, [chatID]);
+  }, [chatID]); //this useEffect listens to changes in the chatID and fetches the chat data from the database.
+
   const handleEmojiClick = (event) => {
     setMessage(message + event.emoji);
   };
@@ -47,20 +47,22 @@ const Chat = () => {
           sender: currentUser.id,
           time: Date.now(),
         }),
-      });
+      }); // reference and update the chats collection with the new message
 
       const userIDs = [user.id, currentUser.id];
 
+      // this function updates users on both ends' userchats with the new message
       userIDs.forEach(async (id) => {
         const userChatRef = doc(db, "userchats", id);
         const userChatSnap = await getDoc(userChatRef);
 
         if (userChatSnap.exists()) {
-          const userChatData = userChatSnap.data();
+          const userChatData = userChatSnap.data(); // get the userchat data of the recepient or currentUser
           const userIndex = userChatData.chats.findIndex(
-            (chat) => chat.chatID === chatID
+            (chat) => chat.chatID === chatID //find their chatID from userChats
           );
 
+          //make necessary changes
           userChatData.chats[userIndex].lastChat = message;
           userChatData.chats[userIndex].lastMessageTime = Date.now();
           userChatData.chats[userIndex].isSeen =
@@ -71,6 +73,8 @@ const Chat = () => {
           });
         }
       });
+
+      setMessage("");
     } catch (err) {
       console.log(err);
     }
@@ -123,6 +127,9 @@ const Chat = () => {
             setMessage(event.target.value);
           }}
           value={message}
+          onKeyDown={(event) => {
+            event.key === "Enter" && handleSend();
+          }}
         />
         <div className="emoji">
           <img

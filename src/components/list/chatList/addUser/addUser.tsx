@@ -15,7 +15,11 @@ import {
 import { db } from "../../../../lib/firebase";
 import { toast } from "react-toastify";
 import { useUserStore } from "../../../../lib/userStore";
-const AddUser = () => {
+
+interface Props {
+  closeFunc: () => void;
+}
+const AddUser = ({ closeFunc }: Props) => {
   const [user, setUser] = React.useState<DocumentData>([]);
   const { currentUser } = useUserStore();
   const handleSearch = async (e) => {
@@ -68,13 +72,16 @@ const AddUser = () => {
         }),
       });
 
-      console.log(newChatRef.id);
+      toast.success("User Added Successfully");
     } catch (err) {
       console.log(err);
     }
   };
   return (
     <div className="addUser">
+      <div className="image">
+        <img src="/icons8-multiply-100.png" alt="back" onClick={closeFunc} />
+      </div>
       <form onSubmit={handleSearch}>
         <input type="text" placeholder="Username" name="username" />
         <button>Search</button>
