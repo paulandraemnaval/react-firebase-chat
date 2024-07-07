@@ -1,24 +1,22 @@
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
-import { storage } from "./firebase"; // Assuming you have initialized Firebase Storage correctly
+export const download = (link, filename) => {
+  const xhr = new XMLHttpRequest();
+  xhr.responseType = "blob";
+  xhr.onload = (event) => {
+    const blob = event.target.response; // Get the downloaded blob
 
-const download = (filename) => {
-  // Reference to the file in Firebase Storage
-  const storageRef = ref(storage, `images/${filename}`);
+    // Handle the downloaded blob here
+    // For example:
+    // - Create a downloadable link:
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename; // Set a filename
+    link.click();
+    window.URL.revokeObjectURL(url); // Clean up the temporary URL
 
-  // Get the download URL for the file
-  getDownloadURL(storageRef)
-    .then((url) => {
-      // Create a link element to trigger the download
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", filename); // Set the filename for download
-      document.body.appendChild(link);
-      link.click(); // Trigger the click event to initiate download
-      document.body.removeChild(link); // Clean up: remove the link element
-    })
-    .catch((error) => {
-      console.error("Error getting download URL:", error);
-    });
+    // - Or save the file locally (requires additional libraries or server-side logic):
+    //   - Use a library like FileSaver.js to save the blob locally.
+  };
+  xhr.open("GET", link);
+  xhr.send();
 };
-
-export default download;

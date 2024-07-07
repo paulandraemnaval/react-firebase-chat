@@ -6,7 +6,7 @@ import { useChatStore } from "../../lib/chatStore";
 import userInfo from "../list/userInfo/userInfo";
 import { arrayRemove, getDoc, updateDoc } from "firebase/firestore";
 import { arrayUnion, doc } from "firebase/firestore";
-import download from "../../lib/download";
+import { download } from "../../lib/download";
 interface Message {
   img?: string;
   message: string;
@@ -16,10 +16,10 @@ interface Message {
 }
 
 const Detail = () => {
-  const { user, changeBlock, isRecieverBlocked, isCurrentUserBlocked } =
-    useChatStore();
+  type imageTuple = [string, string];
+  const { user, changeBlock, isRecieverBlocked } = useChatStore();
   const { currentUser } = useUserStore();
-  const [images, setImages] = React.useState<string[]>([]);
+  const [images, setImages] = React.useState<imageTuple[]>([]);
   const [showingImages, setShowingImages] = React.useState(false);
   const handleBlock = async () => {
     if (!user) return;
@@ -33,9 +33,7 @@ const Detail = () => {
       console.log(err);
     }
   };
-  const handleDownload = (img) => {
-    download(img);
-  };
+
   const handleImages = async () => {
     try {
       const currentChatSnap = await getDoc(
@@ -52,7 +50,10 @@ const Detail = () => {
       const convo = await getDoc(doc(db, "chats", chatID));
       convo.data()?.messages.forEach((message: Message) => {
         if (message.img) {
-          setImages((prev: any) => [...prev, [message.img, message?.filename]]);
+          setImages((prev) => [
+            ...prev,
+            [message.img!, message.filename || ""],
+          ]);
         }
       });
     } catch (err) {
@@ -99,12 +100,13 @@ const Detail = () => {
                   <div className="photoDetail">
                     <img src={img[0]} alt="image_sent" />
                   </div>
+
                   <img
                     src="/download.png"
                     alt="download"
                     className="downloadIcon"
                     onClick={() => {
-                      handleDownload(img[1]);
+                      download(img[0], img[1]);
                     }}
                   />
                 </div>

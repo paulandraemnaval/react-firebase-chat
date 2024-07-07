@@ -19,6 +19,7 @@ interface chat {
   lastChat: string;
   lastMessageTime: number;
   receiverID: string;
+  img: [string, string];
 }
 
 const chatList = () => {
@@ -134,6 +135,8 @@ const chatList = () => {
               >
                 {currentUser.blocked.includes(chat.user.id)
                   ? "youve blocked this user"
+                  : chat.lastChat === "" && !chat.img
+                  ? "You sent an Image"
                   : chat.lastChat}
               </p>
             </div>
