@@ -48,12 +48,12 @@ const Chat = () => {
   const handleSend = async () => {
     if (message === "" && !image.file) return;
     try {
-      let imageURL = null;
+      let imageURL: [string, string] | null = null;
       if (image?.file) {
         imageURL = await upload(image.file);
       }
 
-      const [firebaseImgURL, fileNameInDatabase] = imageURL;
+      const [firebaseImgURL, fileNameInDatabase] = imageURL ?? ["", ""];
 
       const chatCollectionRef = collection(db, "chats");
       const messageRef = doc(chatCollectionRef, chatID);

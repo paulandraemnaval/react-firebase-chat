@@ -6,7 +6,7 @@ import { useChatStore } from "../../lib/chatStore";
 import userInfo from "../list/userInfo/userInfo";
 import { arrayRemove, getDoc, updateDoc } from "firebase/firestore";
 import { arrayUnion, doc } from "firebase/firestore";
-import { download } from "../../lib/download";
+import download from "../../lib/download";
 interface Message {
   img?: string;
   message: string;
