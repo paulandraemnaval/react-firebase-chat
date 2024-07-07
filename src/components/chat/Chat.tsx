@@ -157,7 +157,7 @@ const Chat = () => {
       <div
         className="bottom"
         style={{
-          display: isRecieverBlocked ? "none" : "block",
+          display: isRecieverBlocked ? "none" : "flex",
         }}
       >
         {image.file && (
