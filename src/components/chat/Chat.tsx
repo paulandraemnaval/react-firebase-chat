@@ -13,12 +13,20 @@ import {
 } from "firebase/firestore";
 import { useChatStore } from "../../lib/chatStore";
 import { useUserStore } from "../../lib/userStore";
+import upload from "../../lib/upload";
+import { set } from "firebase/database";
+
+interface image {
+  file: null;
+  imageURL: string;
+}
 const Chat = () => {
   const [showEmoji, setShowEmoji] = React.useState(false);
   const [message, setMessage] = React.useState("");
   const [chat, setChat] = React.useState<DocumentData>();
+  const [image, setImage] = React.useState<image>({ file: null, imageURL: "" });
   const endRef = React.useRef<HTMLDivElement>(null);
-  const { chatID, changeChat, user } = useChatStore();
+  const { chatID, user, isRecieverBlocked } = useChatStore();
   const { currentUser } = useUserStore();
 
   React.useEffect(() => {
@@ -28,6 +36,7 @@ const Chat = () => {
   React.useEffect(() => {
     const unSub = onSnapshot(doc(db, "chats", chatID), (snap) => {
       setChat(snap.data());
+      console.log(chat);
     });
     return () => unSub();
   }, [chatID]); //this useEffect listens to changes in the chatID and fetches the chat data from the database.
@@ -37,15 +46,26 @@ const Chat = () => {
   };
 
   const handleSend = async () => {
-    if (message === "") return;
+    if (message === "" && !image.file) return;
     try {
+      let imageURL = null;
+      if (image?.file) {
+        imageURL = await upload(image.file);
+      }
+
+      const [firebaseImgURL, fileNameInDatabase] = imageURL;
+
       const chatCollectionRef = collection(db, "chats");
       const messageRef = doc(chatCollectionRef, chatID);
       await updateDoc(messageRef, {
         messages: arrayUnion({
           message: message,
           sender: currentUser.id,
-          time: Date.now(),
+          time: Date(),
+          ...(image.imageURL && {
+            img: firebaseImgURL,
+            filename: fileNameInDatabase,
+          }),
         }),
       }); // reference and update the chats collection with the new message
 
@@ -75,8 +95,21 @@ const Chat = () => {
       });
 
       setMessage("");
+      setImage({ file: null, imageURL: "" });
     } catch (err) {
       console.log(err);
+    }
+  };
+
+  const handleImage = (event) => {
+    event.preventDefault();
+    const file = event.target.files[0];
+    if (file) {
+      setImage({
+        file: file,
+        imageURL: URL.createObjectURL(file),
+      });
+      console.log(image);
     }
   };
 
@@ -97,53 +130,95 @@ const Chat = () => {
         </div>
       </div>
       <div className="center">
-        {chat?.messages.map((message) => (
-          <div
-            className={
-              message.sender === currentUser.id ? "message own" : "message"
-            }
-            key={message.lastMessageTime}
-          >
-            <div className="texts">
-              <p>{message.message}</p>
-              {/* <span>1 min ago</span> */}
-            </div>
+        {isRecieverBlocked ? (
+          <div className="blocked">
+            <p>You have blocked this user</p>
           </div>
-        ))}
+        ) : (
+          chat?.messages.map((message) => (
+            <div
+              className={
+                message.sender === currentUser.id ? "message own" : "message"
+              }
+              key={message.lastMessageTime}
+            >
+              <div className="texts">
+                {message.img && <img src={message.img} alt="img" />}
+                {message.message && <p>{message.message}</p>}
+                {/* <span>1 min ago</span> */}
+              </div>
+            </div>
+          ))
+        )}
+
         <div ref={endRef}></div>
       </div>
 
-      <div className="bottom">
-        <div className="icons">
-          <img src="/img.png" alt="img" />
-          <img src="/camera.png" alt="" />
-          <img src="mic.png" alt="" />
-        </div>
-        <input
-          type="text"
-          placeholder="Type a message"
-          className="messageInput"
-          onChange={(event) => {
-            setMessage(event.target.value);
-          }}
-          value={message}
-          onKeyDown={(event) => {
-            event.key === "Enter" && handleSend();
-          }}
-        />
-        <div className="emoji">
-          <img
-            src="/emoji.png"
-            alt=""
-            onClick={() => setShowEmoji(!showEmoji)}
-          />
-          <div className="emojipicker">
-            <EmojiPicker open={showEmoji} onEmojiClick={handleEmojiClick} />
+      <div
+        className="bottom"
+        style={{
+          display: isRecieverBlocked ? "none" : "block",
+        }}
+      >
+        {image.file && (
+          <div className="selected-image">
+            <div className="cancel">
+              <img
+                src="/icons8-multiply-100.png"
+                alt="cancel"
+                onClick={() =>
+                  setImage({
+                    file: null,
+                    imageURL: "",
+                  })
+                }
+              />
+            </div>
+            <div className="texts">
+              <img src={image.imageURL} alt="sent_image" />
+            </div>
           </div>
+        )}
+        <div className="message-controls">
+          <div className="icons">
+            <label htmlFor="file">
+              <img src="/img.png" alt="img" />
+            </label>
+            <input
+              type="file"
+              id="file"
+              onChange={handleImage}
+              style={{ display: "none" }}
+            />
+            <img src="/camera.png" alt="" />
+            <img src="mic.png" alt="" />
+          </div>
+          <input
+            type="text"
+            placeholder="Type a message"
+            className="messageInput"
+            onChange={(event) => {
+              setMessage(event.target.value);
+            }}
+            value={message}
+            onKeyDown={(event) => {
+              event.key === "Enter" && handleSend();
+            }}
+          />
+          <div className="emoji">
+            <img
+              src="/emoji.png"
+              alt=""
+              onClick={() => setShowEmoji(!showEmoji)}
+            />
+            <div className="emojipicker">
+              <EmojiPicker open={showEmoji} onEmojiClick={handleEmojiClick} />
+            </div>
+          </div>
+          <button className="send" onClick={handleSend}>
+            Send
+          </button>
         </div>
-        <button className="send" onClick={handleSend}>
-          Send
-        </button>
       </div>
     </div>
   );

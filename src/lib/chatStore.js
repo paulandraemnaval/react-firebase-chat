@@ -7,23 +7,29 @@ export const useChatStore = create((set) => ({
   user: null,
   isCurrentUserBlocked: false,
   isRecieverBlocked: false,
+
   changeChat: (chatID, user) => {
+    console.log("changeChat: Recipient->", user);
     const currentUser = useUserStore.getState().currentUser;
-    if (user.blocked.includes(currentUser.uid)) {
-      return set({
+    if (user.blocked.includes(currentUser.id)) {
+      console.log("current user is blocked by reciever");
+      set({
         chatID,
-        user: null,
+        user,
         isCurrentUserBlocked: true,
         isRecieverBlocked: false,
       });
-    } else if (currentUser.blocked.includes(user.uid)) {
-      return set({
+    }
+    if (currentUser.blocked.includes(user.id)) {
+      console.log("reciever is blocked by current user");
+      set({
         chatID,
-        user: user,
+        user,
         isCurrentUserBlocked: false,
         isRecieverBlocked: true,
       });
     } else {
+      console.log("no one is blocked");
       return set({
         chatID,
         user,
@@ -33,6 +39,9 @@ export const useChatStore = create((set) => ({
     }
   },
   changeBlock: () => {
-    set((state) => ({ ...state, isRecieverBlocked: !state.isRecieverBlocked }));
+    set((state) => ({
+      ...state,
+      isRecieverBlocked: !state.isRecieverBlocked,
+    }));
   },
 }));

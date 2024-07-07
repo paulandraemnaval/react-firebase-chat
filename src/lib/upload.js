@@ -3,7 +3,8 @@ import { storage } from "./firebase";
 
 const upload = async (file) => {
   const date = new Date();
-  const storageRef = ref(storage, `images/${date.getTime()}_${file.name}`);
+  const append = `${date.getTime()}_${file.name}`;
+  const storageRef = ref(storage, `images/${append}`);
   const uploadTask = uploadBytesResumable(storageRef, file);
 
   return new Promise((resolve, reject) => {
@@ -19,7 +20,7 @@ const upload = async (file) => {
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          resolve(downloadURL);
+          resolve([downloadURL, append]);
         });
       }
     );

@@ -11,6 +11,7 @@ import { useChatStore } from "./lib/chatStore";
 const App = () => {
   const { currentUser, isLoading, fetchUserInfo } = useUserStore();
   const { chatID } = useChatStore();
+  const { isRecieverBlocked } = useChatStore();
 
   useEffect(() => {
     const unSub = onAuthStateChanged(auth, (user) => {
@@ -19,10 +20,9 @@ const App = () => {
     return () => {
       unSub();
     };
-  }, [fetchUserInfo]);
+  }, [fetchUserInfo, isRecieverBlocked]);
 
   if (isLoading) return <div className="loading">Loading...</div>;
-  console.log("App.js: chatID -> ", chatID);
   return (
     <div className="container">
       {currentUser ? (

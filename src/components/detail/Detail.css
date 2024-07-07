@@ -47,7 +47,7 @@
 }
 .photos {
   display: flex;
-  gap: 20px;
+  gap: 10px;
   flex-direction: column;
   margin-top: 20px;
 }
@@ -79,7 +79,7 @@
 
 .photoItem .downloadIcon {
   cursor: pointer;
-  border-radius: 50%;
+  border-radius: 5px;
   padding: 5px;
   height: 30px;
   width: 30px;

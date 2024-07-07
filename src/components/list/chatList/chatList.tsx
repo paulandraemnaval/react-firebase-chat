@@ -6,12 +6,15 @@ import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 import { useChatStore } from "../../../lib/chatStore";
 import { DocumentData } from "firebase/firestore/lite";
+
 interface chat {
   chatID: string;
   isSeen: boolean;
   user: {
+    id: string;
     avatar: string;
     username: string;
+    blocked: [];
   };
   lastChat: string;
   lastMessageTime: number;
@@ -22,9 +25,8 @@ const chatList = () => {
   const [isAdding, setIsAdding] = React.useState(false);
   const [chats, setChats] = React.useState([]);
   const { currentUser } = useUserStore();
-  const { chatID, changeChat } = useChatStore();
-
-  console.log("chatList.tsx ->", chatID);
+  const { chatID, changeChat, isRecieverBlocked, isCurrentUserBlocked } =
+    useChatStore();
 
   React.useEffect(() => {
     const onSub = onSnapshot(
@@ -70,7 +72,7 @@ const chatList = () => {
       await updateDoc(doc(db, "userchats", currentUser.id), {
         chats: userChats,
       });
-      changeChat(chat.chatID, chat.user);
+      changeChat(chat.chatID, chat.user); // user is the recepient here
     } catch (err) {
       console.log(err);
     }
@@ -90,34 +92,52 @@ const chatList = () => {
         />
       </div>
       {chats.map(
-        (chat: chat) => (
-          console.log("chatList.tsx ->", chat),
-          (
-            <div
-              className="item"
-              key={chat.chatID}
-              onClick={() => {
-                handleSelectChat(chat);
-              }}
-              style={{
-                backgroundColor: chat.isSeen ? "transparent" : "#5183fe",
-              }}
-            >
-              <img src={chat.user.avatar} alt="avatar" />
-              <div className="texts">
-                <span>{chat.user.username}</span>
-                <p
-                  style={{
-                    color: chat.isSeen
-                      ? "rgba(127, 139, 141, 0.911)"
-                      : "1white",
-                  }}
-                >
-                  {chat.lastChat}
-                </p>
-              </div>
+        (
+          chat: chat //chat is an object that has the recepient user and the chat data
+        ) => (
+          <div
+            className="item"
+            key={chat.chatID}
+            onClick={() => {
+              handleSelectChat(chat);
+            }}
+            style={{
+              backgroundColor: chat.isSeen
+                ? "transparent"
+                : currentUser.blocked.includes(chat.user.id)
+                ? "transparent"
+                : "#5183fe",
+            }}
+          >
+            <img
+              src={
+                currentUser.blocked.includes(chat.user.id)
+                  ? "/avatar.png"
+                  : chat.user.avatar
+              }
+              alt="avatar"
+            />
+            <div className="texts">
+              <span>
+                {currentUser.blocked.includes(chat.user.id)
+                  ? "User"
+                  : chat.user.username}
+              </span>
+              <p
+                style={{
+                  color: chat.isSeen
+                    ? "rgba(127, 139, 141, 0.911)"
+                    : currentUser.blocked.includes(chat.user.id)
+                    ? "rgba(127, 139, 141, 0.911)"
+                    : "white",
+                }}
+              >
+                {currentUser.blocked.includes(chat.user.id)
+                  ? "youve blocked this user"
+                  : chat.lastChat}
+              </p>
             </div>
-          )
+          </div>
         )
       )}
       {isAdding && <AddUser closeFunc={() => setIsAdding(false)} />}

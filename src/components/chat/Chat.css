@@ -88,6 +88,8 @@
   padding: 20px;
   border-radius: 10px;
   background-color: #5183fe;
+  width: fit-content;
+  align-self: flex-start;
 }
 
 .center .message .texts span {
@@ -114,16 +116,69 @@
 
 .center .message.own .texts p {
   background-color: white;
+  width: fit-content;
+  align-self: flex-end;
 }
 
 .bottom {
   display: flex;
+  flex-direction: column;
   padding: 20px;
   margin-top: auto;
   border-top: 1px solid #dddddd35;
   justify-content: space-between;
   gap: 20px;
   align-items: center;
+}
+
+.bottom .message-controls {
+  display: flex;
+  width: 100%;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+}
+
+.bottom .selected-image {
+  display: flex;
+  position: relative;
+  align-items: center;
+  background-color: rgba(127, 139, 141, 0.7);
+  padding: 10px;
+  border-radius: 10px;
+  margin-right: auto;
+}
+
+.bottom .selected-image .cancel {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+.bottom .selected-image .cancel img {
+  height: 30px;
+  width: 30px;
+  cursor: pointer;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.bottom .message-controls .icons {
+  display: flex;
+  gap: 20px;
+}
+
+.bottom .message-controls .messageInput {
+  grid-area: messageInput;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: rgba(127, 139, 141, 0.7);
+  border: none;
+  padding: 10px;
+  color: white;
+  flex: 1;
+  border-radius: 10px;
+  outline: none;
 }
 
 .bottom .icons {
@@ -168,4 +223,20 @@
   position: absolute;
   bottom: 50px;
   left: 0;
+}
+
+.selected-image .texts img {
+  width: 300px;
+  height: 200px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.blocked {
+  align-self: center;
+  justify-self: center;
+  font-size: 40px;
+  color: white;
+  font-weight: bold;
+  margin-top: 40%;
 }
