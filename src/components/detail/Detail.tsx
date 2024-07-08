@@ -93,9 +93,10 @@ const Detail = () => {
               }}
             />
           </div>
-          <div className="photos">
-            {showingImages &&
-              images.map((img, index) => (
+
+          {showingImages &&
+            images.map((img, index) => (
+              <div className="photos">
                 <div className="photoItem" key={`photo_${index}`}>
                   <div className="photoDetail">
                     <img src={img[0]} alt="image_sent" />
@@ -110,8 +111,8 @@ const Detail = () => {
                     }}
                   />
                 </div>
-              ))}
-          </div>
+              </div>
+            ))}
         </div>
         <div className="option">
           <div className="title">
