@@ -28,6 +28,7 @@ const chatList = () => {
   const { currentUser } = useUserStore();
   const { chatID, changeChat, isRecieverBlocked, isCurrentUserBlocked } =
     useChatStore();
+  const [latestSender, setLatestSender] = React.useState("");
 
   React.useEffect(() => {
     const onSub = onSnapshot(
@@ -52,6 +53,14 @@ const chatList = () => {
         setChats(
           chatData.sort((a, b) => b.lastMessageTime - a.lastMessageTime) // set chats as the recievers of the currentUser sorted by lastMessageTime. Structure is the same as interface
         );
+
+        const chatRef = doc(db, "chats", chatID);
+        const chatSnap = await getDoc(chatRef);
+
+        const latestSender =
+          chatSnap.data()?.messages[chatSnap.data()!.messages.length - 1]
+            .sender;
+        setLatestSender(latestSender);
       }
     );
 
@@ -78,6 +87,19 @@ const chatList = () => {
       console.log(err);
     }
   };
+
+  const handleDisplayMessage = (chat) => {
+    if (chat.user.blocked.includes(currentUser.id)) return "User is blocked";
+    else if (currentUser.blocked.includes(chat.user.id))
+      return "User is blocked";
+    else if (chat.lastChat === "" && chat.isLatestImage) {
+      if (latestSender === currentUser.id) return "You sent an image";
+      else return `${chat.user.username} sent an image`;
+    } else if (chat.lastChat === "" && !chat.isLatestImage)
+      return "No message yet";
+    else return chat.lastChat;
+  };
+
   return (
     <div className="chatList">
       <div className="search">
@@ -133,11 +155,7 @@ const chatList = () => {
                     : "white",
                 }}
               >
-                {currentUser.blocked.includes(chat.user.id)
-                  ? "youve blocked this user"
-                  : chat.lastChat === "" && chat.img
-                  ? "You sent an Image"
-                  : chat.lastChat}
+                {handleDisplayMessage(chat)}
               </p>
             </div>
           </div>
