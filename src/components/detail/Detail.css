@@ -1,6 +1,7 @@
 .Detail {
   flex: 1;
   overflow-y: scroll;
+  color: white;
 }
 .Detail .user {
   display: flex;
