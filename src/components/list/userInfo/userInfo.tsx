@@ -37,7 +37,7 @@ const userInfo = () => {
         <img src={currentUser.avatar || "/avatar.png"} alt="avatar"></img>
         <div className="usertext">
           <h2>{currentUser.username}</h2>
-          <p>{currentUser.description}</p>
+          {currentUser.description && <p>{currentUser.description}</p>}
         </div>
       </div>
       <div className="icons">

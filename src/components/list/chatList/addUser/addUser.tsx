@@ -4,6 +4,7 @@ import {
   collection,
   DocumentData,
   getDocs,
+  getDoc,
   query,
   serverTimestamp,
   setDoc,
@@ -22,6 +23,7 @@ interface Props {
 const AddUser = ({ closeFunc }: Props) => {
   const [user, setUser] = React.useState<DocumentData>([]);
   const { currentUser } = useUserStore();
+
   const handleSearch = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -45,6 +47,17 @@ const AddUser = ({ closeFunc }: Props) => {
   const handleAdd = async () => {
     const chatRef = collection(db, "chats");
     const userChatRef = collection(db, "userchats");
+
+    const currentUserChats = await getDoc(doc(userChatRef, currentUser.id));
+
+    const check = currentUserChats
+      .data()!
+      .chats?.find((chat) => chat.recieverID === user.id);
+
+    if (check) {
+      toast.error("User Already Added");
+      return;
+    }
 
     try {
       const newChatRef = doc(chatRef);

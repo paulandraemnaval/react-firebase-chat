@@ -120,7 +120,7 @@ const Chat = () => {
           <img src={user.avatar} alt="userImage" />
           <div className="texts">
             <span>{user.username}</span>
-            <p>{user.description || ""}</p>
+            {user.description && <p>{user.description}</p>}
           </div>
         </div>
         <div className="icons">

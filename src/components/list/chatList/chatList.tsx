@@ -135,7 +135,7 @@ const chatList = () => {
               >
                 {currentUser.blocked.includes(chat.user.id)
                   ? "youve blocked this user"
-                  : chat.lastChat === "" && !chat.img
+                  : chat.lastChat === "" && chat.img
                   ? "You sent an Image"
                   : chat.lastChat}
               </p>
