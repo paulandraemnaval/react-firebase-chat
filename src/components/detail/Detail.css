@@ -1,6 +1,6 @@
 .Detail {
   flex: 1;
-  overflow-y: scroll;
+  overflow-y: auto;
   color: white;
   display: flex;
   flex-direction: column;
