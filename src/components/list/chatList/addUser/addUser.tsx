@@ -50,9 +50,11 @@ const AddUser = ({ closeFunc }: Props) => {
 
     const currentUserChats = await getDoc(doc(userChatRef, currentUser.id));
 
-    const check = currentUserChats
-      .data()!
-      .chats?.find((chat) => chat.recieverID === user.id);
+    const check =
+      currentUserChats
+        .data()!
+        .chats?.find((chat) => chat.recieverID === user.id) ||
+      currentUser.id === user.id;
 
     if (check) {
       toast.error("User Already Added");
