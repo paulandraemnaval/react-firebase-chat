@@ -2,7 +2,11 @@
   flex: 1;
   overflow-y: scroll;
   color: white;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
+
 .Detail .user {
   display: flex;
   flex-direction: column;
@@ -23,6 +27,7 @@
 .Detail .info {
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
   gap: 10px;
   padding: 30px;
 }
@@ -33,6 +38,7 @@
   align-items: center;
   justify-content: space-between;
 }
+
 .Detail .info .option .title span {
   font-weight: bold;
 }
@@ -46,6 +52,7 @@
   object-fit: cover;
   cursor: pointer;
 }
+
 .photos {
   display: flex;
   gap: 10px;
@@ -111,4 +118,13 @@
 
 .info button[class="logoutButton"]:hover {
   background-color: #4a7bf6;
+}
+
+.blockdiv {
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+.blockdiv button {
+  width: 100%;
 }

@@ -119,9 +119,12 @@ const Detail = () => {
             <img src="/arrowUp.png" alt="" />
           </div>
         </div>
-        <button onClick={handleBlock}>
-          {isRecieverBlocked ? "Unblock" : "Block"}
-        </button>
+
+        <div className="blockdiv">
+          <button onClick={handleBlock}>
+            {isRecieverBlocked ? "Unblock" : "Block"}
+          </button>
+        </div>
       </div>
     </div>
   );
