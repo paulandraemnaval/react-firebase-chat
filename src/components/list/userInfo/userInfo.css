@@ -74,3 +74,8 @@
 .usertext {
   min-height: 100%;
 }
+
+.userInfo .icons details ul li[class="logout"]:hover {
+  background-color: #da4557;
+  color: white;
+}

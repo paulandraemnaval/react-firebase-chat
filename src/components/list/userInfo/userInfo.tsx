@@ -52,7 +52,9 @@ const userInfo = () => {
             <li onClick={() => handleMenuClick("changeDescription")}>
               Change User Description
             </li>
-            <li onClick={() => handleMenuClick("Logout")}>Logout</li>
+            <li onClick={() => handleMenuClick("Logout")} className="logout">
+              Logout
+            </li>
           </ul>
         </details>
         <img src="./edit.png" alt="edit_button" />

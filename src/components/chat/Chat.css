@@ -185,6 +185,10 @@
   outline: none;
 }
 
+.messageInput::placeholder {
+  color: white;
+}
+
 .bottom .icons {
   display: flex;
   gap: 20px;
