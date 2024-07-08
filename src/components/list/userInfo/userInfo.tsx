@@ -55,7 +55,6 @@ const userInfo = () => {
             <li onClick={() => handleMenuClick("Logout")}>Logout</li>
           </ul>
         </details>
-        <img src="./video.png" alt="video_button" />
         <img src="./edit.png" alt="edit_button" />
       </div>
       {isChangingUsername && (

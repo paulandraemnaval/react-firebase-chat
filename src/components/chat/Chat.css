@@ -47,8 +47,7 @@
 }
 
 .top .icons {
-  display: flex;
-  gap: 20px;
+  cursor: pointer;
 }
 
 .top .icons img {
@@ -189,6 +188,7 @@
 .bottom .icons {
   display: flex;
   gap: 20px;
+  cursor: pointer;
 }
 
 .bottom img {

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Chat from "./components/chat/Chat";
 import Detail from "./components/detail/Detail";
 import List from "./components/list/List";
@@ -12,7 +12,11 @@ const App = () => {
   const { currentUser, isLoading, fetchUserInfo } = useUserStore();
   const { chatID } = useChatStore();
   const { isRecieverBlocked } = useChatStore();
+  const [showDetail, setShowDetail] = useState(false);
 
+  useEffect(() => {
+    console.log("showdetail", showDetail);
+  }, [showDetail]);
   useEffect(() => {
     const unSub = onAuthStateChanged(auth, (user) => {
       fetchUserInfo(user?.uid);
@@ -28,8 +32,13 @@ const App = () => {
       {currentUser ? (
         <>
           <List />
-          {chatID && <Chat />}
-          {chatID && <Detail />}
+          {chatID && (
+            <Chat
+              setShowDetail={() => setShowDetail(!showDetail)}
+              showDetail={showDetail}
+            />
+          )}
+          {chatID && showDetail && <Detail />}
         </>
       ) : (
         <Login />

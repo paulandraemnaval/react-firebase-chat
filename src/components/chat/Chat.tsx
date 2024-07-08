@@ -16,11 +16,17 @@ import { useUserStore } from "../../lib/userStore";
 import upload from "../../lib/upload";
 import { set } from "firebase/database";
 
+interface Props {
+  setShowDetail: () => void;
+  showDetail: boolean;
+}
+
 interface image {
   file: null;
   imageURL: string;
 }
-const Chat = () => {
+
+const Chat = ({ setShowDetail, showDetail }: Props) => {
   const [showEmoji, setShowEmoji] = React.useState(false);
   const [message, setMessage] = React.useState("");
   const [chat, setChat] = React.useState<DocumentData>();
@@ -28,7 +34,6 @@ const Chat = () => {
   const endRef = React.useRef<HTMLDivElement>(null);
   const { chatID, user, isRecieverBlocked } = useChatStore();
   const { currentUser } = useUserStore();
-
   React.useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chat?.messages]); //chat.messages is the dependency here because we want to scroll to the end of the chat after all messages are loaded
@@ -114,7 +119,7 @@ const Chat = () => {
   };
 
   return (
-    <div className="chat">
+    <div className="chat" style={{ flex: showDetail ? "2" : "3" }}>
       <div className="top">
         <div className="user">
           <img src={user.avatar} alt="userImage" />
@@ -124,9 +129,7 @@ const Chat = () => {
           </div>
         </div>
         <div className="icons">
-          <img src="/phone.png" alt="phone" />
-          <img src="/video.png" alt="video" />
-          <img src="/info.png" alt="more" />
+          <img src="/info.png" alt="more" onClick={() => setShowDetail()} />
         </div>
       </div>
       <div className="center">
@@ -190,8 +193,6 @@ const Chat = () => {
               onChange={handleImage}
               style={{ display: "none" }}
             />
-            <img src="/camera.png" alt="" />
-            <img src="mic.png" alt="" />
           </div>
           <input
             type="text"
