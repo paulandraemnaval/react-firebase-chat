@@ -7,12 +7,17 @@
 }
 
 .userInfo .user {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto;
+  column-gap: 20px;
   align-items: center;
-  gap: 20px;
+  justify-items: center;
 }
 
 .userInfo .user img {
+  grid-column: 1 / span 1;
+  grid-row: 1 / span 2;
   height: 50px;
   width: 50px;
   border-radius: 50%;
@@ -28,4 +33,41 @@
   height: 20px;
   width: 20px;
   cursor: pointer;
+}
+
+.userInfo .icons details {
+  position: relative;
+}
+
+.userInfo .icons details summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.userInfo .icons details ul {
+  position: absolute;
+  background-color: white;
+  color: black;
+  padding: 10px;
+  border-radius: 5px;
+  top: 20px;
+  left: 0;
+  z-index: 1;
+  list-style: none;
+  width: max-content;
+  font-weight: 500;
+}
+
+.userInfo .icons details ul li:hover {
+  background-color: #5183fe;
+  cursor: pointer;
+}
+
+.userInfo .icons details ul li {
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.usertext p {
+  color: rgba(255, 255, 255, 0.5);
 }

@@ -65,7 +65,7 @@ const Detail = () => {
       <div className="user">
         <img src={user?.avatar || "/avatar.png"} alt="avatar" />
         <h2>{user?.username || "User"}</h2>
-        <p>user description goes here</p>
+        <p>{user?.description || ""}</p>
       </div>
       <div className="info">
         <div className="option">
@@ -121,14 +121,6 @@ const Detail = () => {
         </div>
         <button onClick={handleBlock}>
           {isRecieverBlocked ? "Unblock" : "Block"}
-        </button>
-        <button
-          className="logoutButton"
-          onClick={() => {
-            auth.signOut();
-          }}
-        >
-          Log out
         </button>
       </div>
     </div>
