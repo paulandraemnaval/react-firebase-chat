@@ -84,7 +84,7 @@ const Detail = () => {
           <div className="title">
             <span>Shared Photos</span>
             <img
-              src={showingImages ? "/arrowUp.png" : "/arrowDown.png"}
+              src={showingImages ? "/arrowDown.png" : "/arrowUp.png"}
               alt="arrowdown"
               onClick={() => {
                 if (!showingImages) setImages([]);
