@@ -1,7 +1,6 @@
 import { create } from "zustand";
-import { db } from "./firebase";
-import { doc, getDoc } from "firebase/firestore";
 import { useUserStore } from "./userStore";
+
 export const useChatStore = create((set) => ({
   chatID: null,
   user: null,
@@ -11,17 +10,14 @@ export const useChatStore = create((set) => ({
   changeChat: (chatID, user) => {
     const currentUser = useUserStore.getState().currentUser;
     if (user.blocked.includes(currentUser.id)) {
-      console.log("current user is blocked by reciever");
-      set({
+      return set({
         chatID,
         user,
         isCurrentUserBlocked: true,
         isRecieverBlocked: false,
       });
-    }
-    if (currentUser.blocked.includes(user.id)) {
-      console.log("reciever is blocked by current user");
-      set({
+    } else if (currentUser.blocked.includes(user.id)) {
+      return set({
         chatID,
         user,
         isCurrentUserBlocked: false,
@@ -37,6 +33,16 @@ export const useChatStore = create((set) => ({
       });
     }
   },
+
+  resetChat: () => {
+    set({
+      chatID: null,
+      user: null,
+      isCurrentUserBlocked: false,
+      isRecieverBlocked: false,
+    });
+  },
+
   changeBlock: () => {
     set((state) => ({
       ...state,

@@ -10,16 +10,18 @@ import { useUserStore } from "./lib/userStore";
 import { useChatStore } from "./lib/chatStore";
 const App = () => {
   const { currentUser, isLoading, fetchUserInfo } = useUserStore();
-  const { chatID } = useChatStore();
+  const { chatID, resetChat } = useChatStore();
   const { isRecieverBlocked } = useChatStore();
   const [showDetail, setShowDetail] = useState(false);
 
   useEffect(() => {
-    console.log("showdetail", showDetail);
-  }, [showDetail]);
-  useEffect(() => {
     const unSub = onAuthStateChanged(auth, (user) => {
-      fetchUserInfo(user?.uid);
+      if (user) {
+        fetchUserInfo(user?.uid);
+      } else {
+        resetChat();
+        fetchUserInfo(null);
+      }
     });
     return () => {
       unSub();

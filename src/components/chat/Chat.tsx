@@ -41,7 +41,6 @@ const Chat = ({ setShowDetail, showDetail }: Props) => {
   React.useEffect(() => {
     const unSub = onSnapshot(doc(db, "chats", chatID), (snap) => {
       setChat(snap.data());
-      console.log(chat);
     });
     return () => unSub();
   }, [chatID]); //this useEffect listens to changes in the chatID and fetches the chat data from the database.

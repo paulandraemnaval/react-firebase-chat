@@ -89,9 +89,7 @@ const chatList = () => {
   };
 
   const handleDisplayMessage = (chat) => {
-    if (chat.user.blocked.includes(currentUser.id)) return "User is blocked";
-    else if (currentUser.blocked.includes(chat.user.id))
-      return "User is blocked";
+    if (currentUser.blocked.includes(chat.user.id)) return "User is blocked";
     else if (chat.lastChat === "" && chat.isLatestImage) {
       if (latestSender === currentUser.id) return "You sent an image";
       else return `${chat.user.username} sent an image`;
