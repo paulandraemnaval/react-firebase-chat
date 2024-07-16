@@ -4,13 +4,16 @@ import { useUserStore } from "../../../lib/userStore";
 import ChangeUsername from "./changeUsername/changeUsername";
 import ChangeDescription from "./changeDescription/changeDescription";
 import Logout from "./Logout/Logout";
+import CreateGroupChat from "./createGroupChat/CreateGroupChat";
+import { useChatStore } from "../../../lib/chatStore";
 const userInfo = () => {
   const { currentUser } = useUserStore();
+  const { chatID } = useChatStore();
   const [isChangingUsername, setIsChangingUsername] = React.useState(false);
   const [isChangingDescription, setIsChangingDescription] =
     React.useState(false);
   const [isLoggingOut, setIsLoggingOut] = React.useState(false);
-  const [updater, setUpdater] = React.useState(false);
+  const [createGroupChat, setCreateGroupChat] = React.useState(false);
 
   const handleMenuClick = (menu: string) => {
     if (menu === "changeUsername") {
@@ -45,7 +48,7 @@ const userInfo = () => {
           <summary>
             <img src="./more.png" alt="dots_button" />
           </summary>
-          <ul>
+          <ul style={{ left: chatID ? "0px" : "-215px" }}>
             <li onClick={() => handleMenuClick("changeUsername")}>
               Change Username
             </li>
@@ -57,22 +60,21 @@ const userInfo = () => {
             </li>
           </ul>
         </details>
-        <img src="./edit.png" alt="edit_button" />
+        <img
+          src="./edit.png"
+          alt="edit_button"
+          onClick={() => setCreateGroupChat(!createGroupChat)}
+        />
       </div>
       {isChangingUsername && (
-        <ChangeUsername
-          cancel={() => setIsChangingUsername(false)}
-          updater={() => setUpdater(!updater)}
-        />
+        <ChangeUsername cancel={() => setIsChangingUsername(false)} />
       )}
       {isChangingDescription && (
         <ChangeDescription cancel={() => setIsChangingDescription(false)} />
       )}
-      {isLoggingOut && (
-        <Logout
-          cancel={() => setIsLoggingOut(false)}
-          updater={() => setUpdater(!updater)}
-        />
+      {isLoggingOut && <Logout cancel={() => setIsLoggingOut(false)} />}
+      {createGroupChat && (
+        <CreateGroupChat cancel={() => setCreateGroupChat(false)} />
       )}
     </div>
   );

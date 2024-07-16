@@ -5,7 +5,6 @@ import { auth } from "../../../../lib/firebase";
 
 interface Props {
   cancel: () => void;
-  updater: () => void;
 }
 const ChangeUsername = ({ cancel }: Props) => {
   return (

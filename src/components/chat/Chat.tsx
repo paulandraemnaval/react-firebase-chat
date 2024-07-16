@@ -31,19 +31,40 @@ const Chat = ({ setShowDetail, showDetail }: Props) => {
   const [message, setMessage] = React.useState("");
   const [chat, setChat] = React.useState<DocumentData>();
   const [image, setImage] = React.useState<image>({ file: null, imageURL: "" });
+  const [userNames, setUserNames] = React.useState<any[]>([]);
   const endRef = React.useRef<HTMLDivElement>(null);
-  const { chatID, user, isRecieverBlocked } = useChatStore();
+  const { chatID, user, isRecieverBlocked, isGroupChat, groupChat, users } =
+    useChatStore();
   const { currentUser } = useUserStore();
+
   React.useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chat?.messages]); //chat.messages is the dependency here because we want to scroll to the end of the chat after all messages are loaded
 
   React.useEffect(() => {
-    const unSub = onSnapshot(doc(db, "chats", chatID), (snap) => {
-      setChat(snap.data());
-    });
-    return () => unSub();
-  }, [chatID]); //this useEffect listens to changes in the chatID and fetches the chat data from the database.
+    if (isGroupChat) {
+      const chatRef = doc(db, "groupchats", chatID);
+      onSnapshot(chatRef, (response) => {
+        setChat(response.data());
+      });
+      console.log(users, "users");
+      const set = users.map((user) => {
+        return [user.id, user.username];
+      });
+      setUserNames(set);
+      console.log(userNames, "usernames");
+    } else {
+      const chatRef = doc(db, "chats", chatID);
+      onSnapshot(chatRef, (response) => {
+        setChat(response.data());
+      });
+    }
+  }, [chatID, isGroupChat]); //this useEffect listens to changes in the chatID and fetches the chat data from the database.
+
+  const displayUsername = (id: string) => {
+    const username = userNames.find((user) => user[0] === id);
+    return username[1];
+  };
 
   const handleEmojiClick = (event) => {
     setMessage(message + event.emoji);
@@ -59,7 +80,10 @@ const Chat = ({ setShowDetail, showDetail }: Props) => {
 
       const [firebaseImgURL, fileNameInDatabase] = imageURL ?? ["", ""];
 
-      const chatCollectionRef = collection(db, "chats");
+      const chatCollectionRef = collection(
+        db,
+        isGroupChat ? "groupchats" : "chats"
+      );
       const messageRef = doc(chatCollectionRef, chatID);
       await updateDoc(messageRef, {
         messages: arrayUnion({
@@ -73,28 +97,55 @@ const Chat = ({ setShowDetail, showDetail }: Props) => {
         }),
       }); // reference and update the chats collection with the new message
 
-      const userIDs = [user.id, currentUser.id];
-
+      const userIDs = isGroupChat
+        ? users.map((user) => {
+            return user.id;
+          })
+        : [user.id, currentUser.id];
       // this function updates users on both ends' userchats with the new message
       userIDs.forEach(async (id) => {
-        const userChatRef = doc(db, "userchats", id);
+        console.log(
+          `doc(db, ${isGroupChat ? "usergroupchats" : "userchats"}, ${id})`
+        );
+        const userChatRef = doc(
+          db,
+          isGroupChat ? "usergroupchats" : "userchats",
+          id
+        );
         const userChatSnap = await getDoc(userChatRef);
 
         if (userChatSnap.exists()) {
           const userChatData = userChatSnap.data(); // get the userchat data of the recepient or currentUser
-          const userIndex = userChatData.chats.findIndex(
-            (chat) => chat.chatID === chatID //find their chatID from userChats
-          );
+          console.log(userChatData, "userchatdata");
+          const userIndex = isGroupChat
+            ? userChatData.groupchats.findIndex(
+                (chat) => chat.groupchatID === chatID
+              )
+            : userChatData.chats.findIndex((chat) => chat.chatID === chatID);
 
           //make necessary changes
-          userChatData.chats[userIndex].lastChat = message;
-          userChatData.chats[userIndex].lastMessageTime = Date.now();
-          userChatData.chats[userIndex].isSeen =
-            id === currentUser.id ? true : false;
-
-          await updateDoc(userChatRef, {
-            chats: userChatData.chats,
-          });
+          if (!isGroupChat) {
+            userChatData.chats[userIndex].lastChat = message;
+            userChatData.chats[userIndex].lastMessageTime = Date.now();
+            userChatData.chats[userIndex].isSeen =
+              id === currentUser.id ? true : false;
+            await updateDoc(userChatRef, {
+              chats: userChatData.chats,
+            });
+          } else {
+            userChatData.groupchats[userIndex].lastChat = message;
+            userChatData.groupchats[userIndex].lastMessageTime = Date.now();
+            userChatData.groupchats[userIndex].isSeen =
+              id === currentUser.id ? true : false;
+            userChatData.groupchats[userIndex].latestSender =
+              currentUser.username;
+            userChatData.groupchats[userIndex].isLatestImage = image.file
+              ? true
+              : false;
+            await updateDoc(userChatRef, {
+              groupchats: userChatData.groupchats,
+            });
+          }
         }
       });
 
@@ -121,10 +172,13 @@ const Chat = ({ setShowDetail, showDetail }: Props) => {
     <div className="chat" style={{ flex: showDetail ? "2" : "3" }}>
       <div className="top">
         <div className="user">
-          <img src={user.avatar} alt="userImage" />
+          <img
+            src={isGroupChat ? groupChat.avatar : user.avatar}
+            alt="userImage"
+          />
           <div className="texts">
-            <span>{user.username}</span>
-            {user.description && <p>{user.description}</p>}
+            <span>{isGroupChat ? groupChat.groupchatName : user.username}</span>
+            <p>{isGroupChat ? "" : user.description}</p>
           </div>
         </div>
         <div className="icons">
@@ -144,6 +198,9 @@ const Chat = ({ setShowDetail, showDetail }: Props) => {
               }
               key={message.lastMessageTime}
             >
+              {isGroupChat && message.sender !== currentUser.id && (
+                <p className="username">{displayUsername(message.sender)}</p>
+              )}
               <div className="texts">
                 {message.img && <img src={message.img} alt="img" />}
                 {message.message && <p>{message.message}</p>}
@@ -193,12 +250,14 @@ const Chat = ({ setShowDetail, showDetail }: Props) => {
               style={{ display: "none" }}
             />
           </div>
-          <input
-            type="text"
+          <textarea
             placeholder="Type a message"
             className="messageInput"
             onChange={(event) => {
               setMessage(event.target.value);
+              const textarea = event.target as HTMLTextAreaElement;
+              textarea.style.height = "36px";
+              textarea.style.height = textarea.scrollHeight + "px";
             }}
             value={message}
             onKeyDown={(event) => {
@@ -211,7 +270,7 @@ const Chat = ({ setShowDetail, showDetail }: Props) => {
               alt=""
               onClick={() => setShowEmoji(!showEmoji)}
             />
-            <div className="emojipicker">
+            <div className={showDetail ? "emojipicker" : "emojipicker full"}>
               <EmojiPicker open={showEmoji} onEmojiClick={handleEmojiClick} />
             </div>
           </div>

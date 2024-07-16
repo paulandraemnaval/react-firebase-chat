@@ -10,8 +10,7 @@ import { useUserStore } from "./lib/userStore";
 import { useChatStore } from "./lib/chatStore";
 const App = () => {
   const { currentUser, isLoading, fetchUserInfo } = useUserStore();
-  const { chatID, resetChat } = useChatStore();
-  const { isRecieverBlocked } = useChatStore();
+  const { chatID, resetChat, isRecieverBlocked } = useChatStore();
   const [showDetail, setShowDetail] = useState(false);
 
   useEffect(() => {

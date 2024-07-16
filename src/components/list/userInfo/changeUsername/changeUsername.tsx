@@ -5,7 +5,6 @@ import { db } from "../../../../lib/firebase";
 import { useUserStore } from "../../../../lib/userStore";
 interface Props {
   cancel: () => void;
-  updater: () => void;
 }
 const ChangeUsername = ({ cancel }: Props) => {
   const { currentUser } = useUserStore();

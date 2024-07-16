@@ -29,6 +29,10 @@
         border-radius: 5px;
       }
 
+      input::placeholder {
+        color: white;
+      }
+
       label {
         display: flex;
         justify-content: space-evenly;
