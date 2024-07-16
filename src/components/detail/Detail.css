@@ -7,6 +7,10 @@
   height: 100%;
 }
 
+.Detail::-webkit-scrollbar {
+  width: 0;
+}
+
 .Detail .user {
   display: flex;
   flex-direction: column;

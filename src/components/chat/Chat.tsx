@@ -104,9 +104,6 @@ const Chat = ({ setShowDetail, showDetail }: Props) => {
         : [user.id, currentUser.id];
       // this function updates users on both ends' userchats with the new message
       userIDs.forEach(async (id) => {
-        console.log(
-          `doc(db, ${isGroupChat ? "usergroupchats" : "userchats"}, ${id})`
-        );
         const userChatRef = doc(
           db,
           isGroupChat ? "usergroupchats" : "userchats",
@@ -159,13 +156,11 @@ const Chat = ({ setShowDetail, showDetail }: Props) => {
   const handleImage = (event) => {
     event.preventDefault();
     const file = event.target.files[0];
-    if (file) {
-      setImage({
-        file: file,
-        imageURL: URL.createObjectURL(file),
-      });
-      console.log(image);
-    }
+    setImage({
+      file: file,
+      imageURL: URL.createObjectURL(file),
+    });
+    console.log("inserted Image: ", file);
   };
 
   return (
@@ -246,7 +241,7 @@ const Chat = ({ setShowDetail, showDetail }: Props) => {
             <input
               type="file"
               id="file"
-              onChange={handleImage}
+              onChange={(e) => handleImage(e)}
               style={{ display: "none" }}
             />
           </div>

@@ -47,6 +47,7 @@ const chatList = () => {
   const { chatID, changeChat, changeGroupChat } = useChatStore();
   const [latestSender, setLatestSender] = React.useState("");
   const [chatListMode, setChatListMode] = React.useState("DMs");
+  const [search, setSearch] = React.useState("");
 
   React.useEffect(() => {
     if (!currentUser.id) return; // Ensure currentUser.id is defined
@@ -195,7 +196,12 @@ const chatList = () => {
       <div className="search">
         <div className="searchBar">
           <img src="/search.png " alt="search" />
-          <input type="text" className="searchbarInput" placeholder="Search" />
+          <input
+            type="text"
+            className="searchbarInput"
+            placeholder="Search"
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
         <img
           src={isAdding ? "/minus.png" : "plus.png"}
@@ -205,78 +211,98 @@ const chatList = () => {
         />
       </div>
       <div className="selectChats">
-        <h4 onClick={() => setChatListMode("DMs")}>DMs</h4>
-        <h4 onClick={() => setChatListMode("GCs")}>Group Chats</h4>
+        <h4
+          onClick={() => setChatListMode("DMs")}
+          style={{ color: chatListMode === "DMs" ? "#5183fe" : "white" }}
+        >
+          DMs
+        </h4>
+        <h4
+          onClick={() => setChatListMode("GCs")}
+          style={{ color: chatListMode === "GCs" ? "#5183fe" : "white" }}
+        >
+          Group Chats
+        </h4>
       </div>
       <div className="currentchats">
         {chatListMode === "DMs" &&
-          chats.map((chat: chat) => (
-            <div
-              className="item"
-              key={chat.chatID}
-              onClick={() => {
-                handleSelectChat(chat);
-              }}
-              style={{
-                backgroundColor: chat.isSeen
-                  ? "transparent"
-                  : currentUser.blocked.includes(chat.user.id)
-                  ? "transparent"
-                  : "#5183fe",
-              }}
-            >
-              <img
-                src={
-                  currentUser.blocked.includes(chat.user.id)
-                    ? "/avatar.png"
-                    : chat.user.avatar
-                }
-                alt="avatar"
-              />
-              <div className="texts">
-                <span>
-                  {currentUser.blocked.includes(chat.user.id)
-                    ? "User"
-                    : chat.user.username}
-                </span>
-                <p
+          chats.map(
+            (chat: chat) =>
+              chat.user.username
+                .toLowerCase()
+                .includes(search.toLowerCase()) && (
+                <div
+                  className="item"
+                  key={chat.chatID}
+                  onClick={() => {
+                    handleSelectChat(chat);
+                  }}
                   style={{
-                    color: chat.isSeen
-                      ? "rgba(127, 139, 141, 0.911)"
+                    backgroundColor: chat.isSeen
+                      ? "transparent"
                       : currentUser.blocked.includes(chat.user.id)
-                      ? "rgba(127, 139, 141, 0.911)"
-                      : "white",
+                      ? "transparent"
+                      : "#5183fe",
                   }}
                 >
-                  {handleDisplayMessage(chat)}
-                </p>
-              </div>
-            </div>
-          ))}
+                  <img
+                    src={
+                      currentUser.blocked.includes(chat.user.id)
+                        ? "/avatar.png"
+                        : chat.user.avatar
+                    }
+                    alt="avatar"
+                  />
+                  <div className="texts">
+                    <span>
+                      {currentUser.blocked.includes(chat.user.id)
+                        ? "User"
+                        : chat.user.username}
+                    </span>
+                    <p
+                      style={{
+                        color: chat.isSeen
+                          ? "rgba(127, 139, 141, 0.911)"
+                          : currentUser.blocked.includes(chat.user.id)
+                          ? "rgba(127, 139, 141, 0.911)"
+                          : "white",
+                      }}
+                    >
+                      {handleDisplayMessage(chat)}
+                    </p>
+                  </div>
+                </div>
+              )
+          )}
 
         {chatListMode === "GCs" && (
           <div>
-            {groupchats.map((chat: groupchat) => (
-              <div
-                className="item"
-                key={chat.groupchatID}
-                onClick={() => {
-                  handleSelectGroupChat(chat);
-                }}
-                style={{
-                  backgroundColor: chat.isSeen ? "transparent" : "#5183fe",
-                }}
-              >
-                <img src={chat.avatar || "/avatar.png"} alt="avatar" />
-                <div className="texts">
-                  <span>{chat.groupchatName}</span>
-                  <p>
-                    {handleDisplaySender(chat)}
-                    {handleDisplayMessageGC(chat)}
-                  </p>
-                </div>
-              </div>
-            ))}
+            {groupchats.map(
+              (chat: groupchat) =>
+                chat.groupchatName
+                  .toLowerCase()
+                  .includes(search.toLowerCase()) && (
+                  <div
+                    className="item"
+                    key={chat.groupchatID}
+                    onClick={() => {
+                      handleSelectGroupChat(chat);
+                    }}
+                    style={{
+                      backgroundColor: chat.isSeen ? "transparent" : "#5183fe",
+                    }}
+                  >
+                    <img src={chat.avatar || "/avatar.png"} alt="avatar" />
+                    <div className="texts">
+                      <span>{chat.groupchatName}</span>
+                      <p>
+                        {handleDisplaySender(chat)}
+                        {handleDisplayMessageGC(chat)}
+                      </p>
+                    </div>
+                  </div>
+                )
+            )}
           </div>
         )}
       </div>

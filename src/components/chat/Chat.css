@@ -194,6 +194,7 @@
   flex: 1;
   border-radius: 10px;
   outline: none;
+  height: 35px;
 }
 
 .messageInput::-webkit-scrollbar {
