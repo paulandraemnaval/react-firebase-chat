@@ -2,10 +2,21 @@ import React from "react";
 import "./chatList.css";
 import AddUser from "./addUser/addUser";
 import { useUserStore } from "../../../lib/userStore";
-import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
-import { db } from "../../../lib/firebase";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  onSnapshot,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
+import { auth, db } from "../../../lib/firebase";
 import { useChatStore } from "../../../lib/chatStore";
 import { DocumentData } from "firebase/firestore/lite";
+import { onAuthStateChanged } from "firebase/auth";
+import { set } from "firebase/database";
 
 interface groupchat {
   avatar: string;
@@ -44,11 +55,34 @@ const chatList = () => {
   const [chats, setChats] = React.useState([]);
   const [groupchats, setGroupchats] = React.useState([]);
   const { currentUser } = useUserStore();
-  const { chatID, changeChat, changeGroupChat } = useChatStore();
+  const { chatID, changeChat, changeGroupChat, resetChat } = useChatStore();
   const [latestSender, setLatestSender] = React.useState("");
   const [chatListMode, setChatListMode] = React.useState("DMs");
   const [search, setSearch] = React.useState("");
+  const [onlineUsers, setOnlineUsers] = React.useState<string[][] | undefined>(
+    []
+  );
 
+  React.useEffect(() => {
+    const usersRef = collection(db, "users");
+    const getusers = async () =>
+      await getDocs(query(usersRef, where("online", "==", true)));
+    const users = getusers().then((response) => {
+      const onlineUsers: any = response.docs.map((doc) => {
+        if (doc.data().online) {
+          return [doc.data().id, doc.data().username];
+        }
+      });
+
+      if (onlineUsers) {
+        setOnlineUsers(onlineUsers);
+      }
+    });
+    console.log(users, "users");
+  }, [currentUser.id]);
+  React.useEffect(() => {
+    console.log(onlineUsers, "onlineUsers");
+  }, [onlineUsers]);
   React.useEffect(() => {
     if (!currentUser.id) return; // Ensure currentUser.id is defined
     const onSub1 = onSnapshot(
@@ -255,6 +289,9 @@ const chatList = () => {
                   />
                   <div className="texts">
                     <span>
+                      {onlineUsers?.find((user) => user[0] === chat.user.id)
+                        ? "🟢 "
+                        : "🔴 "}
                       {currentUser.blocked.includes(chat.user.id)
                         ? "User"
                         : chat.user.username}
@@ -295,7 +332,7 @@ const chatList = () => {
                     <img src={chat.avatar || "/avatar.png"} alt="avatar" />
                     <div className="texts">
                       <span>{chat.groupchatName}</span>
-                      <p>
+                      <p style={{ color: chat.isSeen ? "#dddddd35" : "white" }}>
                         {handleDisplaySender(chat)}
                         {handleDisplayMessageGC(chat)}
                       </p>

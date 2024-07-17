@@ -8,8 +8,16 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./lib/firebase";
 import { useUserStore } from "./lib/userStore";
 import { useChatStore } from "./lib/chatStore";
+import { set } from "firebase/database";
 const App = () => {
-  const { currentUser, isLoading, fetchUserInfo } = useUserStore();
+  const {
+    currentUser,
+    isLoading,
+    fetchUserInfo,
+    setOnline,
+    setOffline,
+    resetUser,
+  } = useUserStore();
   const { chatID, resetChat, isRecieverBlocked } = useChatStore();
   const [showDetail, setShowDetail] = useState(false);
 
@@ -17,9 +25,10 @@ const App = () => {
     const unSub = onAuthStateChanged(auth, (user) => {
       if (user) {
         fetchUserInfo(user?.uid);
+        setOnline(user?.uid);
       } else {
+        resetUser();
         resetChat();
-        fetchUserInfo(null);
       }
     });
     return () => {

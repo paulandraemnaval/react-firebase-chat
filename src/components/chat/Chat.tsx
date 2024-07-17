@@ -62,8 +62,12 @@ const Chat = ({ setShowDetail, showDetail }: Props) => {
   }, [chatID, isGroupChat]); //this useEffect listens to changes in the chatID and fetches the chat data from the database.
 
   const displayUsername = (id: string) => {
-    const username = userNames.find((user) => user[0] === id);
-    return username[1];
+    const username = userNames.map((user) => {
+      if (user[0] === id) {
+        return user[1];
+      }
+    });
+    return username;
   };
 
   const handleEmojiClick = (event) => {
@@ -153,6 +157,33 @@ const Chat = ({ setShowDetail, showDetail }: Props) => {
     }
   };
 
+  const [time, setTime] = React.useState(new Date());
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setTime(new Date());
+    }, 60000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  const handleTimeAgo = (time: string) => {
+    const date = new Date(time);
+    const diff = new Date().getTime() - date.getTime();
+    const minutes = Math.floor(diff / 60000);
+    if (minutes < 1) {
+      return "Just Now";
+    } else if (minutes < 60) {
+      return `${minutes}m ago`;
+    } else if (minutes < 1440) {
+      return `${Math.floor(minutes / 60)}h ago`;
+    } else {
+      return `${Math.floor(minutes / 1440)}d ago`;
+    }
+  };
+
   const handleImage = (event) => {
     event.preventDefault();
     const file = event.target.files[0];
@@ -186,7 +217,7 @@ const Chat = ({ setShowDetail, showDetail }: Props) => {
             <p>You have blocked this user</p>
           </div>
         ) : (
-          chat?.messages.map((message) => (
+          chat?.messages.map((message, index) => (
             <div
               className={
                 message.sender === currentUser.id ? "message own" : "message"
@@ -199,8 +230,10 @@ const Chat = ({ setShowDetail, showDetail }: Props) => {
               <div className="texts">
                 {message.img && <img src={message.img} alt="img" />}
                 {message.message && <p>{message.message}</p>}
-                {/* <span>1 min ago</span> */}
               </div>
+              {chat.messages.length - 1 === index && (
+                <p className="time">{handleTimeAgo(message.time)}</p>
+              )}
             </div>
           ))
         )}

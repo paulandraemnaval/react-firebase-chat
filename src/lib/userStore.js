@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { db } from "./firebase";
-import { doc, getDoc } from "firebase/firestore";
-import { updateDoc } from "firebase/firestore/lite";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { update } from "firebase/database";
 
 export const useUserStore = create((set) => ({
   currentUser: null,
@@ -20,6 +20,32 @@ export const useUserStore = create((set) => ({
     } catch (err) {
       console.log(err);
       set({ currentUser: null, isLoading: false });
+    }
+  },
+
+  resetUser() {
+    set({ currentUser: null, isLoading: false });
+  },
+
+  setOnline: async (uid) => {
+    try {
+      const docRef = doc(db, "users", uid);
+      await updateDoc(docRef, {
+        online: true,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  },
+
+  setOffline: async (uid) => {
+    try {
+      const docRef = doc(db, "users", uid);
+      await updateDoc(docRef, {
+        online: false,
+      });
+    } catch (err) {
+      console.log(err);
     }
   },
 }));

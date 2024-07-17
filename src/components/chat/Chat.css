@@ -114,7 +114,6 @@
 .center .message.own {
   max-width: 70%;
   align-self: flex-end;
-  gap: 20px;
 }
 
 .center .message .texts img {
@@ -268,4 +267,14 @@
   color: white;
   font-weight: bold;
   margin-top: 40%;
+}
+
+.time {
+  font-size: 12px;
+  color: #252525e5;
+  font-weight: 300;
+}
+
+.message.own .time {
+  align-self: flex-end;
 }
